@@ -1,7 +1,8 @@
 <?php
-namespace System;
+namespace System\Contracts;
 
-interface IController{
+interface IController
+{
 	public function setEnviroment(array $urlParams) : void;
 	public function render() : string;
 }

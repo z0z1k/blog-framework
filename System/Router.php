@@ -1,7 +1,9 @@
 <?php
 namespace System;
+use System\Contracts\IRouter;
+use System\Exceptions\Exc404;
 
-class Router{
+class Router implements IRouter{
 	protected string $baseUrl;
 	protected int $baseShift;
 	protected array $routes = [];
@@ -12,7 +14,8 @@ class Router{
 		$this->baseShift = strlen($this->baseUrl);
 	}
 
-	public function addRoute(string $url, string $contorllerName, string $contorllerMethod = 'index'){
+	public function addRoute(string $url, string $contorllerName, string $contorllerMethod = 'index') : void
+	{
 		$this->routes[] = [
 			'path' => $url,
 			'c' => $contorllerName,
@@ -35,7 +38,7 @@ class Router{
 		];
 	}
 
-	protected function findPath(string $url) : ?array
+	protected function findPath(string $url) : array
 	{
 		$activeRoute = null;
 
@@ -43,6 +46,10 @@ class Router{
 			if($url === $route['path']){
 				$activeRoute = $route;
 			}
+		}
+
+		if ($activeRoute == null) {
+			throw new Exc404('404');
 		}
 
 		return $activeRoute;

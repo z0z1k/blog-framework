@@ -4,14 +4,17 @@ include_once('init.php');
 const BASE_URL = '/';
 
 use System\Router;
-use Articles\Controller as ArticleC;
+use System\ModulesDispatcher;
+use Modules\Articles\Controllers\Index as ArticleC;
+use Modules\Articles\Module as Articles;
+use System\Exceptions\Exc404;
 
 try {
+$modules = new ModulesDispatcher;
+$modules->add(new Articles());
 $router = new Router(BASE_URL);
 
-$router->addRoute('', ArticleC::class);
-$router->addRoute('article/1', ArticleC::class, 'item');
-$router->addRoute('article/2', ArticleC::class, 'item'); // e t.c post/99, post/100 lol :))
+$modules->registerRoutes($router);
 
 $uri = $_SERVER['REQUEST_URI'];
 $activeRoute = $router->resolvePath($uri);
@@ -22,13 +25,10 @@ $m = $activeRoute['method'];
 $c->$m();
 $html = $c->render();
 echo $html;
-} catch (Throwable $e) {
-    echo 'nice fatal error must be here';
+} 
+catch (Exc404 $e) {
+    echo '404 error ' . $e->getMessage();
 }
-?>
-
-<hr>
-Menu
-<a href="<?=BASE_URL?>">Home</a>
-<a href="<?=BASE_URL?>article/1">Art 1</a>
-<a href="<?=BASE_URL?>article/2">Art 2</a>
+catch (Throwable $e) {
+    echo 'nice fatal error must be here ' . $e->getMessage();
+}
