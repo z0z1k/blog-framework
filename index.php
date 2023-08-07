@@ -2,6 +2,10 @@
 
 include_once('init.php');
 const BASE_URL = '/';
+const DB_HOST = 'localhost';
+const DB_NAME = 'oop';
+const DB_USER = 'root';
+const DB_PASS = '';
 
 use System\Router;
 use System\ModulesDispatcher;
@@ -25,6 +29,7 @@ $m = $activeRoute['method'];
 $c->$m();
 $html = $c->render();
 echo $html;
+
 } 
 catch (Exc404 $e) {
     echo '404 error ' . $e->getMessage();

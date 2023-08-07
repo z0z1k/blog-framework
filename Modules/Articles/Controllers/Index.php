@@ -1,6 +1,8 @@
 <?php
 namespace Modules\Articles\Controllers;
+
 use Modules\_base\Controller as BaseC;
+use Modules\Articles\Models\Index as Model;
 use System\Contracts\IStorage;
 
 use System\FileStorage;
@@ -16,10 +18,11 @@ class Index extends BaseC{
 
 	public function index()
 	{
-		$this->title = 'Home page';
-		$this->content = 'Articles list';
+		$mIndex = Model::getInstance();
+		$articles = $mIndex->all();
 
-		parent::render();
+		$this->title = 'Home page';
+		$this->content = Template::render(__DIR__ . '/../Views/v_all.php', ['articles' => $articles]);
 	}
 
 	public function item()
@@ -29,6 +32,5 @@ class Index extends BaseC{
 		$article = $this->storage->get($id);
 
 		$this->content = Template::render(__DIR__ . '/../Views/v_item.php', ['article' => $article]);
-		parent::render();
 	}
 }
