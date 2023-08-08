@@ -2,6 +2,7 @@
 
 namespace System\DataBase;
 use PDO;
+use PDOStatement;
 
 class Connection
 {
@@ -29,8 +30,18 @@ class Connection
 
 	public function select(string $query, array $params = []) : ?array
 	{
+		return $this->query($query, $params)->fetchAll();
+	}
+
+	public function query(string $query, array $params = []) : PDOStatement
+	{
 		$query = $this->db->prepare($query);
 		$query->execute($params);
-		return $query->fetchAll();
+		return $query;
+	}
+
+	public function lastInsertId() : int
+	{
+		return (int)$this->db->lastInsertId();
 	}
 }

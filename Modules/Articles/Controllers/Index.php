@@ -2,24 +2,25 @@
 namespace Modules\Articles\Controllers;
 
 use Modules\_base\Controller as BaseC;
-use Modules\Articles\Models\Index as Model;
+use Modules\Articles\Models\Index as ModelIndex;
 use System\Contracts\IStorage;
 
 use System\FileStorage;
 use System\Template;
 
+use System\Exceptions\ExcValidation;
+
 class Index extends BaseC{
-	protected IStorage $storage;
+	protected ModelIndex $model;
 
 	public function __construct()
 	{
-		$this->storage = FileStorage::getInstance('db/articles.txt'); // yes-yes, without DI it is trash
+		$this->model = ModelIndex::getInstance();
 	}
 
 	public function index()
 	{
-		$mIndex = Model::getInstance();
-		$articles = $mIndex->all();
+		$articles = $this->model->all();
 
 		$this->title = 'Home page';
 		$this->content = Template::render(__DIR__ . '/../Views/v_all.php', ['articles' => $articles]);
@@ -29,8 +30,19 @@ class Index extends BaseC{
 	{
 		$this->title = 'Article page';
 		$id = (int)$this->env[1];
-		$article = $this->storage->get($id);
+		$article = $this->model->get($id);
 
 		$this->content = Template::render(__DIR__ . '/../Views/v_item.php', ['article' => $article]);
+	}
+
+	public function add()
+	{
+		$this->title = 'New article';
+		try {
+			$this->model->add(['title' => '', 'content' => '34']);
+		}
+		catch (ExcValidation $e) {
+			$this->content = $e->getMessage();
+		}
 	}
 }
