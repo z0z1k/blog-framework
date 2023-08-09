@@ -1,0 +1,11 @@
+{
+    "name": "z0z1k/blog-framework",
+    "autoload": {
+        "psr-4": {
+            "Z0z1k\\BlogFramework\\": "src/"
+        }
+    },
+    "require": {
+        "rakit/validation": "^1.4"
+    }
+}

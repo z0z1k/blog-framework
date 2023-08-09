@@ -9,11 +9,14 @@ use System\Exceptions\Exc404;
 class Controller implements IController{
 	protected string $title = '';
 	protected string $content = '';
-	protected array $env;
+	protected array $env = [];
 
-	public function setEnviroment(array $urlParams) : void
+	public function setEnviroment(array $urlParams, array $get, array $post, array $server) : void
 	{
-		$this->env = $urlParams;
+		$this->env['params'] = $urlParams;
+		$this->env['get'] = $get;
+		$this->env['post'] = $post;
+		$this->env['server'] = $server;
 	}
 
 	public function render() : string

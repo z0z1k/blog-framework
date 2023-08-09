@@ -9,11 +9,12 @@ class Module implements IModule
 {
     public function registerRoutes(IRouter $router) : void
     {
-        $router->addRoute('', ArticleC::class);
-        $router->addRoute('article/1', ArticleC::class, 'item');
-        $router->addRoute('article/2', ArticleC::class, 'item'); // e t.c post/99, post/100 lol :))
-        $router->addRoute('article/add', ArticleC::class, 'add');
-        $router->addRoute('article/delete/1', ArticleC::class, 'remove');
-        $router->addRoute('article/edit/2', ArticleC::class, 'edit');
+        $i = '[1-9]+\d*';
+        $map = [1 => 'id'];
+        $router->addRoute('/^$/', ArticleC::class);
+        $router->addRoute("/^article\/($i)$/", ArticleC::class, 'item', $map);
+        $router->addRoute('/^article\/add$/', ArticleC::class, 'add');
+        $router->addRoute("/^article\/delete\/($i)/", ArticleC::class, 'remove', $map);
+        $router->addRoute("/^article\/edit\/($i)/", ArticleC::class, 'edit', $map);
     }
 }

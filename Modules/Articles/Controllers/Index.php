@@ -29,7 +29,7 @@ class Index extends BaseC{
 	public function item()
 	{
 		$this->title = 'Article page';
-		$id = (int)$this->env[1];
+		$id = $this->env['params']['id'];
 		$article = $this->model->get($id);
 
 		$this->content = Template::render(__DIR__ . '/../Views/v_item.php', ['article' => $article]);
@@ -38,11 +38,17 @@ class Index extends BaseC{
 	public function add()
 	{
 		$this->title = 'New article';
-		try {
-			$this->model->add(['title' => '', 'content' => '34']);
-		}
-		catch (ExcValidation $e) {
-			$this->content = $e->getMessage();
+
+		if($this->env['server']['REQUEST_METHOD'] === "POST") {
+			try {
+				$this->model->add(['title' => $this->env['post']['title'], 'content' => $this->env['post']['content']]);
+				echo 'Article added';
+			}
+			catch (ExcValidation $e) {
+				$this->content = "Can't add article";
+			}
+		} else {
+			$this->content = Template::render(__DIR__ . '/../Views/v_add.php');
 		}
 	}
 

@@ -14,12 +14,13 @@ class Router implements IRouter{
 		$this->baseShift = strlen($this->baseUrl);
 	}
 
-	public function addRoute(string $url, string $contorllerName, string $contorllerMethod = 'index') : void
+	public function addRoute(string $regExp, string $cName, string $cMethod = 'index', array $map = []) : void
 	{
 		$this->routes[] = [
-			'path' => $url,
-			'c' => $contorllerName,
-			'm' => $contorllerMethod
+			'path' => $regExp,
+			'c' => $cName,
+			'm' => $cMethod,
+			'paramsMap' => $map,
 		];
 	}
 
@@ -27,10 +28,8 @@ class Router implements IRouter{
 	{
 		$relativeUrl = substr($url, $this->baseShift);
 		$route = $this->findPath($relativeUrl);
-		$params = explode('/', $relativeUrl);
 		$controller = new $route['c']();
-		$controller->setEnviroment($params);
-		// var_dump($controller instanceof IController); // hmmmm
+		$controller->setEnviroment($route['params'], $_GET, $_POST, $_SERVER);
 
 		return [
 			'controller' => $controller,
@@ -43,7 +42,17 @@ class Router implements IRouter{
 		$activeRoute = null;
 
 		foreach($this->routes as $route){
-			if($url === $route['path']){
+			$matches = [];
+
+			if(preg_match($route['path'], $url, $matches)){
+				$route['params'] = [];
+
+				foreach ($route['paramsMap'] as $i => $key) {
+					if (isset($matches[$i])) {
+						$route['params'][$key] = $matches[$i];
+					}
+				}
+
 				$activeRoute = $route;
 			}
 		}
