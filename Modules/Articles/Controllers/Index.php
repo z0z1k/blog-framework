@@ -45,4 +45,21 @@ class Index extends BaseC{
 			$this->content = $e->getMessage();
 		}
 	}
+
+	public function remove()
+	{
+		var_dump($this->model->remove(1));
+	}
+
+	public function edit()
+	{
+		$this->title = 'Edit article';
+		$this->content = '222';
+		try {
+			$this->model->edit(2, ['title' => '', 'content' => 'new content']);
+		}
+		catch (ExcValidation $e) {
+			$this->content = "can't edit article";
+		}
+	}
 }

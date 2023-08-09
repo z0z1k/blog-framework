@@ -29,8 +29,12 @@ abstract class Model
     {
         $this->db = Connection::getInstance();
         $this->validator = new Validator($this->validationRules);
+    }
 
-        var_dump($this->validationRules);
+    public function selector() : QuerySelect
+    {
+        $builder = new SelectBuilder($this->table);
+        return new QuerySelect($this->db, $builder);
     }
 
     public function all() : array
@@ -64,14 +68,36 @@ abstract class Model
         $masksStr = implode(', ', $masks);
 
         $query = "INSERT INTO {$this->table} ($namesStr) VALUES ($masksStr)";
-        var_dump($query);
         $this->db->query($query, $fields);
         return $this->db->lastInsertId();
     }
 
-    public function selector() : QuerySelect
+    public function remove(int $id) : bool
     {
-        $builder = new SelectBuilder($this->table);
-        return new QuerySelect($this->db, $builder);
+        $query = "DELETE FROM {$this->table} WHERE {$this->fk} = :id";
+        $query = $this->db->query($query, ['id' => $id]);
+        return $query->rowCount() > 0;
+    }
+
+    public function edit(int $id, array $fields) : bool
+    {
+        $isValid = $this->validator->run($fields);
+        var_dump($isValid);
+
+        if (!$isValid) {
+            throw new ExcValidation();
+        }
+        
+        $pairs = [];
+
+        foreach ($fields as $field => $val) {
+            $pairs[] = "$field=:$field";
+        }
+
+        $pairsStr = implode(', ', $pairs);
+
+        $query = "UPDATE {$this->table} SET $pairsStr WHERE {$this->fk} = :fk";
+        $this->db->query($query, $fields + [$this->fk => $id]);
+        return true;
     }
 }

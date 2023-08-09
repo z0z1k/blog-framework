@@ -13,5 +13,7 @@ class Module implements IModule
         $router->addRoute('article/1', ArticleC::class, 'item');
         $router->addRoute('article/2', ArticleC::class, 'item'); // e t.c post/99, post/100 lol :))
         $router->addRoute('article/add', ArticleC::class, 'add');
+        $router->addRoute('article/delete/1', ArticleC::class, 'remove');
+        $router->addRoute('article/edit/2', ArticleC::class, 'edit');
     }
 }
