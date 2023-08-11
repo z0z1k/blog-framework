@@ -6,6 +6,7 @@
         }
     },
     "require": {
-        "rakit/validation": "^1.4"
+        "rakit/validation": "^1.4",
+        "twig/twig": "^3.7"
     }
 }

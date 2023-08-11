@@ -10,6 +10,12 @@ class Controller implements IController{
 	protected string $title = '';
 	protected string $content = '';
 	protected array $env = [];
+	protected Template $view;
+
+	public function __construct()
+	{
+		$this->view = Template::getInstance();
+	}
 
 	public function setEnviroment(array $urlParams, array $get, array $post, array $server) : void
 	{
@@ -21,7 +27,7 @@ class Controller implements IController{
 
 	public function render() : string
 	{
-		return Template::render(__DIR__ . '/v_main.php', [
+		return $this->view->render('_base/v_main.twig', [
             'title' => $this->title,
             'content' => $this->content,
         ]);

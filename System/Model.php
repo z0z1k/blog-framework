@@ -6,6 +6,7 @@ use System\DataBase\Connection;
 use System\DataBase\QuerySelect;
 use System\DataBase\SelectBuilder;
 use System\Exceptions\ExcValidation;
+use Rakit\Validation\Validator;
 
 abstract class Model
 {
@@ -28,7 +29,7 @@ abstract class Model
     protected function __construct()
     {
         $this->db = Connection::getInstance();
-        $this->validator = new Validator($this->validationRules);
+        $this->validator = new Validator();
     }
 
     public function selector() : QuerySelect
@@ -50,10 +51,11 @@ abstract class Model
 
     public function add(array $fields) : int
     {
-        $isValid = $this->validator->run($fields);
+        $validation = $this->validator->validate($fields, $this->validationRules);
 
-        if (!$isValid) {
-            throw new ExcValidation();
+        if ($validation->fails()) {
+
+            throw new ExcValidation("can't add article", $validation->errors());
         }
 
         $names = [];

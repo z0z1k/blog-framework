@@ -15,7 +15,11 @@ class Index extends BaseC{
 
 	public function __construct()
 	{
+		parent::__construct();
 		$this->model = ModelIndex::getInstance();
+		/*echo "<pre>";
+		var_dump($this->view->twig);*/
+
 	}
 
 	public function index()
@@ -23,7 +27,7 @@ class Index extends BaseC{
 		$articles = $this->model->all();
 
 		$this->title = 'Home page';
-		$this->content = Template::render(__DIR__ . '/../Views/v_all.php', ['articles' => $articles]);
+		$this->content = $this->view->twig->render('Articles/Views/v_all.twig', ['articles' => $articles]);
 	}
 
 	public function item()
@@ -32,24 +36,35 @@ class Index extends BaseC{
 		$id = $this->env['params']['id'];
 		$article = $this->model->get($id);
 
-		$this->content = Template::render(__DIR__ . '/../Views/v_item.php', ['article' => $article]);
+		//$this->content = $this->view->render('Articles//Views/v_item.twig', ['article' => $article]);
 	}
 
 	public function add()
 	{
+		$fields = [];
+		$errors = [];
 		$this->title = 'New article';
 
 		if($this->env['server']['REQUEST_METHOD'] === "POST") {
 			try {
-				$this->model->add(['title' => $this->env['post']['title'], 'content' => $this->env['post']['content']]);
-				echo 'Article added';
+				$fields = [
+					'title' => $this->env['post']['title'],
+					'content' => $this->env['post']['content']
+				];
+				$id = $this->model->add($fields);
+				header("Location: " . BASE_URL . "article/$id");
+				exit();
 			}
 			catch (ExcValidation $e) {
-				$this->content = "Can't add article";
+				$bag = $e->getBag();
+				$errors = $bag->firstOfAll();
 			}
-		} else {
-			$this->content = Template::render(__DIR__ . '/../Views/v_add.php');
 		}
+			$this->content = $this->view->render('Articles//Views/v_add.twig', [
+				'fields' => $fields,
+				'errors' => $errors,
+			]);
+		
 	}
 
 	public function remove()
