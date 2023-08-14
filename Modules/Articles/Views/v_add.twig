@@ -1,9 +1,9 @@
 <form method="post">
-    Title <input name="title" value="{{ fields['title'] ?? '' }}">
-    {{ errors['title'] ?? ''}}
+    Title <input name="title" value="{{ fields.title }}">
+    {{ errors.title }}
     <hr>
-    Content <textarea name="content">{{ fields['content'] ?? '' }}</textarea>
-    {{ errors['content'] ?? ''}}
+    Content <textarea name="content">{{ fields.content }}</textarea>
+    {{ errors.content }}
     <hr>
     <button>Send</button>
 </form>

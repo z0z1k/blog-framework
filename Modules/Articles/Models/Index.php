@@ -11,7 +11,7 @@ class Index extends Model
     protected string $fk = 'id_article';
 
     protected array $validationRules = [
-        'title' => 'required|min:6',
+        'title' => 'required|min:6|max:20|unique',
         'content' => 'required|min:20',
     ];
 }

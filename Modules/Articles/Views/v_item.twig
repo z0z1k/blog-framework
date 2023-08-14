@@ -1,5 +1,6 @@
 <div class="article-item">
-    <h2>{{$article['title'] }}</h2>
-    <div>{{$article['content'] }}</div>
+    <h2>{{ article.title }}</h2>
+    <div>{{ article.content }}</div>
+    <a href="{{ baseUrl }}article/edit/{{ article.id_article }}">Edit this</a>
 </div>
 <hr>

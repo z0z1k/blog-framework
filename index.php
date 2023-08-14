@@ -13,9 +13,12 @@ use System\Router;
 use System\ModulesDispatcher;
 use Modules\Articles\Controllers\Index as ArticleC;
 use Modules\Articles\Module as Articles;
+use System\Template;
 use System\Exceptions\Exc404;
 
 try {
+Template::getInstance()->addGlobalVar('baseUrl', BASE_URL);
+
 $modules = new ModulesDispatcher;
 $modules->add(new Articles());
 $router = new Router(BASE_URL);

@@ -30,6 +30,7 @@ abstract class Model
     {
         $this->db = Connection::getInstance();
         $this->validator = new Validator();
+        $this->validator->addValidator('unique', new UniqueRule($this->db));
     }
 
     public function selector() : QuerySelect
@@ -44,14 +45,15 @@ abstract class Model
     }
 
     public function get(int $id) : ?array
-    {
+    {         
         $res = $this->selector()->where("{$this->fk} = :fk", ['fk' => $id])->get();
         return $res[0] ?? null;
     }
 
     public function add(array $fields) : int
     {
-        $validation = $this->validator->validate($fields, $this->validationRules);
+        $rules = $this->rebuildRules($this->validationRules);
+        $validation = $this->validator->validate($fields, $rules);
 
         if ($validation->fails()) {
 
@@ -83,11 +85,11 @@ abstract class Model
 
     public function edit(int $id, array $fields) : bool
     {
-        $isValid = $this->validator->run($fields);
-        var_dump($isValid);
+        $rules = $this->rebuildRules($this->validationRules, $id);
+        $validation = $this->validator->validate($fields, $rules);
 
-        if (!$isValid) {
-            throw new ExcValidation();
+        if ($validation->fails()) {
+            throw new ExcValidation("can't edit article", $validation->errors());
         }
         
         $pairs = [];
@@ -99,7 +101,25 @@ abstract class Model
         $pairsStr = implode(', ', $pairs);
 
         $query = "UPDATE {$this->table} SET $pairsStr WHERE {$this->fk} = :fk";
-        $this->db->query($query, $fields + [$this->fk => $id]);
+        $this->db->query($query, $fields + ['fk' => $id]);
         return true;
+    }
+
+    protected function rebuildRules(array $rules, ?int $fk = null)
+    {
+        $mask = 'unique';
+
+        foreach ($rules as $field => $rule) {
+            if (strpos($rule, $mask) !== false) {
+                $updRule = str_replace($mask, "$mask:{$this->table},$field", $rule);
+
+                if ($fk !== null) {
+                    $updRule .= ",{$this->fk},$fk";
+                }
+
+                $rules[$field] = $updRule;
+            }
+        }
+        return $rules;
     }
 }

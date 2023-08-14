@@ -4,11 +4,10 @@ namespace Modules\Articles\Controllers;
 use Modules\_base\Controller as BaseC;
 use Modules\Articles\Models\Index as ModelIndex;
 use System\Contracts\IStorage;
-
-use System\FileStorage;
 use System\Template;
 
 use System\Exceptions\ExcValidation;
+use System\Exceptions\Exc404;
 
 class Index extends BaseC{
 	protected ModelIndex $model;
@@ -17,9 +16,6 @@ class Index extends BaseC{
 	{
 		parent::__construct();
 		$this->model = ModelIndex::getInstance();
-		/*echo "<pre>";
-		var_dump($this->view->twig);*/
-
 	}
 
 	public function index()
@@ -35,8 +31,11 @@ class Index extends BaseC{
 		$this->title = 'Article page';
 		$id = $this->env['params']['id'];
 		$article = $this->model->get($id);
+		if ($article === null) {
+			throw new Exc404('article not found');
+		}
 
-		//$this->content = $this->view->render('Articles//Views/v_item.twig', ['article' => $article]);
+		$this->content = $this->view->render('Articles//Views/v_item.twig', ['article' => $article]);
 	}
 
 	public function add()
@@ -74,13 +73,36 @@ class Index extends BaseC{
 
 	public function edit()
 	{
+		$id = (int)$this->env['params']['id'];
+		$article = $this->model->get($id);
+
+		if ($article === null) {
+			throw new Exc404('article not found');
+		}
+
+		$fields = ['title' => $article['title'], 'content' => $article['content']];
+		$errors = [];
+
 		$this->title = 'Edit article';
-		$this->content = '222';
-		try {
-			$this->model->edit(2, ['title' => '', 'content' => 'new content']);
+
+		if($this->env['server']['REQUEST_METHOD'] === "POST") {
+			try {
+				$fields = [
+					'title' => $this->env['post']['title'],
+					'content' => $this->env['post']['content']
+				];
+				$this->model->edit($id, $fields);
+				header("Location: " . BASE_URL . "article/$id");
+				exit();
+			}
+			catch (ExcValidation $e) {
+				$bag = $e->getBag();
+				$errors = $bag->firstOfAll();
+			}
 		}
-		catch (ExcValidation $e) {
-			$this->content = "can't edit article";
-		}
+			$this->content = $this->view->render('Articles//Views/v_add.twig', [
+				'fields' => $fields,
+				'errors' => $errors,
+			]);
 	}
 }
