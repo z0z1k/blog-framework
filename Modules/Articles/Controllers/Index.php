@@ -100,7 +100,7 @@ class Index extends BaseC{
 				$errors = $bag->firstOfAll();
 			}
 		}
-			$this->content = $this->view->render('Articles//Views/v_add.twig', [
+			$this->content = $this->view->render('Articles//Views/v_edit.twig', [
 				'fields' => $fields,
 				'errors' => $errors,
 			]);

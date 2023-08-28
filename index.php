@@ -11,8 +11,12 @@ const DB_PASS = '';
 
 use System\Router;
 use System\ModulesDispatcher;
+
 use Modules\Articles\Controllers\Index as ArticleC;
 use Modules\Articles\Module as Articles;
+
+use Modules\Users\Module as Users;
+
 use System\Template;
 use System\Exceptions\Exc404;
 
@@ -21,6 +25,7 @@ Template::getInstance()->addGlobalVar('baseUrl', BASE_URL);
 
 $modules = new ModulesDispatcher;
 $modules->add(new Articles());
+$modules->add(new Users());
 $router = new Router(BASE_URL);
 
 $modules->registerRoutes($router);
